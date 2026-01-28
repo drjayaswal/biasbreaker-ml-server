@@ -17,7 +17,7 @@ def extract_text_from_url(content: bytes, mime_type: str) -> str:
             doc = Document(stream)
             text = " ".join([para.text for para in doc.paragraphs if para.text])
 
-        else: # Default to text
+        else:
             text = content.decode("utf-8", errors="ignore")
 
     except Exception as e:
@@ -30,7 +30,6 @@ async def extext(url: str):
         if resp.status_code != 200:
             raise Exception(f"Download Error: {resp.status_code}")
         
-        # Determine MIME type from headers or URL fallback
         m_type = resp.headers.get("Content-Type", "").lower()
         if not m_type or "octet-stream" in m_type:
             ext = url.split('?')[0].lower()
