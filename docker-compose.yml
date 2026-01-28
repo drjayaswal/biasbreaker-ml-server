@@ -1,23 +1,29 @@
-name: biasbreaker
-
-# --- Local Image Context ---
-
-# services:
-#   ml-server:
-#     container_name: ml-server
-#     build: .
-#     ports:
-#       - "8001:8001"
-#     restart: always
-
-
-# --- hub.docker Image Context ---
+name: biasbreaker-ml-server
 
 services:
-  ml-server:
-    container_name: ml-server
+  ml-server-local:
+    container_name: biasbreaker-ml-server-local
+    build: .
+    ports:
+      - "8001:8001"
+    env_file:
+      - .env
+    networks:
+      - biasbreaker-net
+    restart: "no"
+
+  ml-server-hub:
+    container_name: biasbreaker-ml-server-hub
     image: dhruv2k3/biasbreaker-ml-server:latest
     pull_policy: always
     ports:
       - "8001:8001"
+    env_file:
+      - .env
+    networks:
+      - biasbreaker-net
     restart: always
+
+networks:
+  biasbreaker-net:
+    driver: bridge
