@@ -1,36 +1,34 @@
-# --- Builder Stage (Use the full image to avoid 'apt-get' download issues) ---
+# --- Builder Stage ---
 FROM python:3.11-bookworm AS builder
-
 WORKDIR /app
-
-# Copy requirements from the main folder
 COPY requirements.txt .
+# Install to a specific prefix to make copying easier
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 
-# Install dependencies into the /root/.local folder
-RUN pip install --no-cache-dir --user -r requirements.txt
-
-# --- Runner Stage (Keep the final image small) ---
+# --- Runner Stage ---
 FROM python:3.11-slim-bookworm AS runner
 
-# Install only the necessary runtime library for ML (libgomp1)
+# Install runtime dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgomp1 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Copy the installed packages from the builder stage
-COPY --from=builder /root/.local /root/.local
-# Copy all your code (including the /app folder)
+# Copy the installed packages from the builder
+COPY --from=builder /install /usr/local
+# Copy your application code
 COPY . .
 
-# Ensure the app can find the installed packages
-ENV PATH=/root/.local/bin:$PATH
+# Environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+# Ensure NLTK data is stored in a predictable place
+ENV NLTK_DATA=/app/nltk_data
 
-# Render's default port is 10000
+# Pre-download NLTK data into the image
+RUN python -m nltk.downloader -d /app/nltk_data punkt punkt_tab
+
 EXPOSE 10000
 
-# Start Uvicorn pointing to app/main.py
 CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-10000}"]
