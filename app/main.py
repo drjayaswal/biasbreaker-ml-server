@@ -9,6 +9,10 @@ import app.services.pre_process as extract
 app = FastAPI()
 get_settings = settings()
 
+@app.get("/")
+def read_root():
+    return {"status": "BiasBreaker ML Server is running"}
+
 @app.post("/analyze-s3")
 async def analyze_s3(data: dict):
     file_url = data.get('file_url')
