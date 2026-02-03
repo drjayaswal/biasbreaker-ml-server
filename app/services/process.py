@@ -14,10 +14,10 @@ nltk.download('punkt_tab')
 
 
 try:
-    nlp = spacy.load("en_core_web_md")
+    nlp = spacy.load("en_core_web_sm")
 except:
-    os.system("python -m spacy download en_core_web_md")
-    nlp = spacy.load("en_core_web_md")
+    os.system("python -m spacy download en_core_web_sm")
+    nlp = spacy.load("en_core_web_sm")
 data_path = os.path.join(os.getcwd(), "nltk_data")
 if data_path not in nltk.data.path:
     nltk.data.path.append(data_path)
