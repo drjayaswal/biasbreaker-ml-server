@@ -6,6 +6,9 @@ class Settings(BaseSettings):
     AWS_SECRET_ACCESS_KEY: str
     AWS_REGION: str
     AWS_BUCKET_NAME: str
+    ML_SERVER_API_KEY: str
+    API_KEY_NAME: str
+    
     model_config = SettingsConfigDict(env_file=".env")
 
 @lru_cache
