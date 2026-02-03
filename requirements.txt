@@ -3,7 +3,8 @@ numpy==2.0.2
 scipy==1.13.1
 scikit-learn==1.6.1
 spacy==3.8.11
-en_core_web_md @ https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.8.0/en_core_web_md-3.8.0-py3-none-any.whl
+# Corrected: Name matches the URL and uses the Small (sm) model
+en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl
 nltk==3.9.2
 
 # --- Server & API ---
@@ -22,6 +23,7 @@ jinja2==3.1.6
 boto3==1.42.35
 PyPDF2==3.0.1
 python-docx==1.2.0
+# pillow and lxml are heavy; keep them only if you are processing images/complex XML
 pillow==11.3.0
 lxml==6.0.2
 pyyaml==6.0.3
