@@ -30,6 +30,7 @@ Thumbs.db
 # --- Databases ---
 *.sqlite3
 *.db
+/chroma_db
 
 # Misc
 *.txt

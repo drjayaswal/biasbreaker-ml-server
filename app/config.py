@@ -8,7 +8,8 @@ class Settings(BaseSettings):
     AWS_BUCKET_NAME: str
     ML_SERVER_API_KEY: str
     API_KEY_NAME: str
-    
+    BACKEND_URL: str
+    HF_ACCESS_TOKEN: str
     model_config = SettingsConfigDict(env_file=".env")
 
 @lru_cache
