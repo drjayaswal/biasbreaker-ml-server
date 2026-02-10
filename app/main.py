@@ -32,8 +32,9 @@ from langchain.docstore.document import Document
 from langchain.chains import create_retrieval_chain
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_core._api import LangChainDeprecationWarning
 from fastapi import FastAPI, HTTPException, BackgroundTasks
+from langchain_core._api import LangChainDeprecationWarning
+from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEndpoint, ChatHuggingFace
 from langchain.chains.combine_documents import create_stuff_documents_chain
@@ -96,7 +97,6 @@ async def get_api_key(api_key: str = Depends(key_header)):
         return key
     raise HTTPException(status_code=403, detail="Could not validate credentials")
 
-
 app = FastAPI()
 
 
@@ -106,7 +106,6 @@ async def update_to_neon(source_id: str, chunks):
     SYNC_URL = f"{env.BACKEND_URL}/update-source-chunks"
     texts = [doc.page_content for doc in chunks]
     vectors = embeddings.embed_documents(texts)
-    
     payload = {
         "source_id": source_id,
         "chunks": [
@@ -114,7 +113,6 @@ async def update_to_neon(source_id: str, chunks):
             for text, vector in zip(texts, vectors)
         ]
     }
-    
     async with httpx.AsyncClient(timeout=120.0) as client:
         response = await client.post(SYNC_URL, json=payload)
         if response.status_code != 200:
@@ -127,12 +125,10 @@ async def process_pdf(text: str, source_id: str, filename: str):
     try:
         doc = Document(page_content=text, metadata={"source_id": source_id, "name": filename})
         chunks = text_splitter.split_documents([doc])
-
         await update_to_neon(source_id, chunks)
         vector_db.add_documents(chunks)
         async with httpx.AsyncClient() as client:
             await client.patch(STATUS_URL, json={"source_id": source_id, "status": "completed"})
-            
     except Exception as e:
         async with httpx.AsyncClient() as client:
             await client.patch(STATUS_URL, json={"source_id": source_id, "status": "failed"})
@@ -147,7 +143,6 @@ async def process_video(url: str, source_id: str):
         vector_db.add_documents(chunks)
         async with httpx.AsyncClient() as client:
             await client.patch(STATUS_URL, json={"source_id": source_id, "status": "completed"})
-            
     except Exception as e:
         logging.error(f"ML Video Processing Failed: {e}")
         async with httpx.AsyncClient() as client:
@@ -178,8 +173,6 @@ async def get_vector(req: VectorRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Embedding failed: {e}")
 
-from langchain_core.messages import SystemMessage, HumanMessage
-
 @app.post("/generate-answer")
 async def generate_answer(request: GenerateRequest):
     try:
@@ -188,28 +181,18 @@ async def generate_answer(request: GenerateRequest):
                 "answer": "I couldn't find any relevant information in the documents to answer this.",
                 "status": "no_context"
             }
-
         system_instructions = (
             "You are a helpful AI assistant. Use the provided context to answer the question. "
-            "If the answer isn't in the context, say you don't know.\n\n"
+            "If the answer isn't in the context, say you don't know and politely ask for context.\n\n"
             f"CONTEXT:\n{request.context}"
         )
-
         messages = [
             SystemMessage(content=system_instructions),
             HumanMessage(content=request.question)
         ]
         response = llm.invoke(messages)
-        
-        return {
-            "answer": response.content,
-            "status": "success"
-        }
+        return {"answer": response.content, "status": "success"}
     except Exception as e:
-        logging.error(f"Generation Error: {str(e)}")
-        # Print full error to ML console for debugging
-        import traceback
-        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"AI Generation failed: {str(e)}")
 
 @app.post("/analyze-video",dependencies=[Depends(get_api_key)])
@@ -271,6 +254,5 @@ async def analyze_drive(data: dict):
             resume_text = extract.text(resp.content, target_mime)
         results = await process(resume_text, description, filename)
         return results
-        
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
