@@ -1,5 +1,5 @@
 ---
-title: Basal ML Server
+title: Alluvium ML Server
 emoji: 🚀
 colorFrom: blue
 colorTo: red
@@ -7,9 +7,9 @@ sdk: docker
 app_port: 7860
 ---
 
-# Basal ML Server
+# Alluvium ML Server
 
-A machine learning server for the Basal project that detects and mitigates bias in AI systems.
+A machine learning server for the Alluvium project that detects and mitigates bias in AI systems.
 
 ## Prerequisites
 
@@ -21,10 +21,10 @@ A machine learning server for the Basal project that detects and mitigates bias 
 
 ```bash
 # Clone the repository
-git clone https://github.com/drjayaswal/basal-ml-server.git
+git clone https://github.com/drjayaswal/alluvium-ml-server.git
 
 # Navigate to the project directory
-cd basal-ml-server
+cd alluvium-ml-server
 
 # Install dependencies
 pip install -r requirements.txt
@@ -62,17 +62,17 @@ git commit -m "describe your changes"
 
 To build the ML server Docker image:
 ```bash
-docker build -t dhruv2k3/basal-ml-server:latest .
+docker build -t dhruv2k3/alluvium-ml-server:latest .
 ```
 
 To test locally:
 ```bash
-docker run -p 8001:8001 dhruv2k3/basal-ml-server
+docker run -p 8001:8001 dhruv2k3/alluvium-ml-server
 ```
 
 To push to Docker Hub:
 ```bash
-docker push dhruv2k3/basal-ml-server:latest
+docker push dhruv2k3/alluvium-ml-server:latest
 ```
 
 To run via docker-compose:

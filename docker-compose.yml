@@ -1,13 +1,13 @@
 services:
   ml-server:
-    image: dhruv2k3/basal-ml-server:latest
+    image: dhruv2k3/alluvium-ml-server:latest
     container_name: ml-server
     ports:
       - "8001:8001"
     env_file:
       - .env
     networks:
-      - basal-net
+      - alluvium-net
 networks:
-  basal-net:
+  alluvium-net:
     driver: bridge

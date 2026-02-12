@@ -159,7 +159,7 @@ async def process_video(url: str, source_id: str):
 
 @app.get("/")
 def read_root():
-    return {"status": "Basal ML Server is running..."}
+    return {"status": "Alluvium ML Server is running..."}
 
 @app.get("/health")
 async def health_check():
